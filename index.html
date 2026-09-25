@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hong Kong Mahjong Scoring Sheet</title>
+<style>
+:root{
+  color-scheme: light;
+  --tw: 26px;
+  --grx: -13deg;
+  --gry: 18deg;
+  --ink:#1b1a17;
+  --muted:#6d665a;
+  --line:#dcd6c6;
+  --paper:#fbf9f3;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:#f4f1e8;color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 18px 64px}
+
+/* ---------- masthead ---------- */
+.mast{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px}
+.mast h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.6px;line-height:1.1}
+.mast .title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.mast .dash{font-size:19px;font-weight:700;color:#9a9384}
+.mast .zh{font-size:20px;font-weight:700;letter-spacing:3px;color:#2f4f3f;
+  font-family:"PingFang TC","Hiragino Sans TC","Noto Serif CJK TC",serif}
+.howto{
+  flex:1;min-width:300px;border:1.5px solid #9a9384;border-radius:6px;
+  background:#f0ede3;padding:10px 14px;
+}
+.howto h4{margin:0 0 4px;font-size:10px;font-weight:800}
+.howto ul{margin:0;padding-left:16px}
+.howto li{font-size:9.2px;line-height:1.5;color:#3d382f}
+.howto em{color:#8a2f20;font-style:italic;font-weight:600}
+
+/* ---------- column flow ---------- */
+.cols{column-count:3;column-gap:20px}
+@media (max-width:1000px){.cols{column-count:2}}
+@media (max-width:660px){.cols{column-count:1}}
+.grp{break-inside:avoid;page-break-inside:avoid;margin:0 0 18px}
+.grp h2{margin:0 0 7px;font-size:16px;font-weight:800;letter-spacing:-.2px}
+
+/* ---------- entry cards ---------- */
+.ent{
+  break-inside:avoid;page-break-inside:avoid;
+  border:1.5px solid var(--bd);background:var(--bg);border-radius:5px;
+  padding:6px 9px 7px 40px;position:relative;margin:0 0 5px;
+}
+.ent.kid{margin-left:38px;background:var(--bg2)}
+.ent.kid:before{
+  content:"";position:absolute;left:-29px;top:-7px;width:21px;height:26px;
+  border-left:3px solid #2f2b24;border-bottom:3px solid #2f2b24;border-radius:0 0 0 3px;
+}
+.ent.kid:after{
+  content:"";position:absolute;left:-11px;top:12px;
+  border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:9px solid #2f2b24;
+}
+.bdg{
+  position:absolute;left:8px;top:6px;width:24px;height:24px;border-radius:50%;
+  background:var(--bdg);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;letter-spacing:-.4px;
+}
+.bdg.wide{font-size:10.5px}
+.ent h3{margin:0;font-size:12.8px;font-weight:800;line-height:1.3}
+.ent h3 .cn{font-family:"PingFang TC","Hiragino Sans TC","Noto Serif CJK TC",serif;font-weight:700}
+.ent p{margin:2px 0 0;font-size:10.8px;line-height:1.42;color:#413c34}
+.ent .rep{
+  margin-top:3px;font-size:10.3px;line-height:1.4;color:#8a2f20;font-weight:600;
+  border-left:2.5px solid #c8a79c;padding-left:6px;
+}
+.hand{display:flex;flex-wrap:wrap;align-items:flex-end;
+  gap:calc(var(--tw)*0.46) calc(var(--tw)*0.1);margin-top:6px}
+.gap{width:calc(var(--tw)*0.40)}
+.opts{display:flex;flex-wrap:wrap;align-items:flex-start;
+  gap:14px calc(var(--tw)*1.05);margin-top:6px}
+.opt{display:flex;flex-direction:column;align-items:center;gap:3px}
+.opt .hand{margin-top:0}
+.optcap{font-size:10.6px;font-weight:800;color:var(--bdg);white-space:nowrap}
+.ex{margin-top:3px;font-size:10.2px;font-style:italic;color:#6b6252}
+.vmark{color:#8a2f20;font-weight:800}
+.card h3.ctr{text-align:center}
+.howto li.warn{color:#8a2f20;font-weight:700}
+
+/* palettes */
+.g-win {--bg:#e9f6ea;--bg2:#f2faf2;--bd:#74b97c;--bdg:#2f7d3a}
+.g-set {--bg:#fbeae4;--bg2:#fdf3ef;--bd:#dc9179;--bdg:#b1482c}
+.g-tile{--bg:#e4f0fb;--bg2:#f0f7fd;--bd:#79b0de;--bdg:#1c5f9e}
+.g-flw {--bg:#fbe6f0;--bg2:#fdf1f7;--bd:#dd8ab5;--bdg:#a3306d}
+.g-spec{--bg:#f8f4de;--bg2:#fcfaee;--bd:#cbb955;--bdg:#7e6c17}
+
+/* ---------- 3D tile ---------- */
+.tile{
+  --th: calc(var(--tw) * 1.36);
+  --td: calc(var(--tw) * 0.30);
+  position:relative;width:var(--tw);height:var(--th);
+  perspective:700px;display:inline-block;flex:0 0 auto;
+  cursor:grab;touch-action:none;
+  filter:drop-shadow(1px 3px 3px rgba(40,30,10,.28));
+}
+.tile.dragging{cursor:grabbing}
+.cube{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transform:rotateX(var(--rx,var(--grx))) rotateY(var(--ry,var(--gry)));
+  transition:transform .35s cubic-bezier(.22,.61,.36,1)}
+.tile.dragging .cube{transition:none}
+.f{position:absolute;backface-visibility:hidden}
+.f.front,.f.back{width:var(--tw);height:var(--th);left:0;top:0;border-radius:14%/10%}
+.f.front{transform:translateZ(calc(var(--td)/2));padding:7%;
+  background:linear-gradient(150deg,#fffdf6 0%,#f7f1df 46%,#e9e0c7 100%);
+  box-shadow:inset 0 0 0 1px rgba(150,135,100,.35)}
+.f.front.jade{background:linear-gradient(150deg,#2f8f68,#166344 55%,#0d4b33);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)}
+.f.back{transform:rotateY(180deg) translateZ(calc(var(--td)/2));
+  background:linear-gradient(150deg,#2f8f68,#166344 55%,#0d4b33);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.18)}
+.f.right,.f.left{width:var(--td);height:var(--th);top:0;left:calc((var(--tw) - var(--td))/2)}
+.f.right{transform:rotateY(90deg) translateZ(calc(var(--tw)/2));background:linear-gradient(90deg,#f3ecd8,#ddd2b4)}
+.f.left{transform:rotateY(-90deg) translateZ(calc(var(--tw)/2));background:linear-gradient(90deg,#c9bd9c,#e9e0c7)}
+.f.top,.f.bottom{width:var(--tw);height:var(--td);left:0;top:calc((var(--th) - var(--td))/2)}
+.f.top{transform:rotateX(90deg) translateZ(calc(var(--th)/2));background:linear-gradient(180deg,#fffdf4,#eae1c8)}
+.f.bottom{transform:rotateX(-90deg) translateZ(calc(var(--th)/2));background:linear-gradient(180deg,#bdb192,#d8cca9)}
+.panel{position:relative;width:100%;height:100%;overflow:hidden;
+  background:linear-gradient(160deg,#fffefa,#f6f1e2);border-radius:9%/6%;
+  box-shadow:inset 0 0 0 1px rgba(160,145,110,.30), inset 0 1px 2px rgba(0,0,0,.10);
+  font-size:var(--tw);
+  font-family:"PingFang TC","Hiragino Sans TC","Heiti TC","Noto Serif CJK TC","Microsoft JhengHei",serif}
+/* winning-tile marker */
+.tile.win:after{
+  content:"";position:absolute;left:50%;bottom:calc(var(--tw)*-0.3);
+  transform:translateX(-50%);
+  border-left:calc(var(--tw)*0.20) solid transparent;
+  border-right:calc(var(--tw)*0.20) solid transparent;
+  border-bottom:calc(var(--tw)*0.26) solid #bf3226;
+}
+/* faces */
+.dot{position:absolute;border-radius:50%;transform:translate(-50%,-50%);background:currentColor;
+  box-shadow:0 .5px 0 rgba(0,0,0,.25)}
+.dot:before{content:"";position:absolute;inset:20%;border-radius:50%;background:#fdfbf4}
+.dot:after{content:"";position:absolute;inset:42%;border-radius:50%;background:currentColor}
+.c-b{color:#1f5fa8}.c-g{color:#1a7a44}.c-r{color:#bf3226}
+.bam{position:absolute;transform:translate(-50%,-50%);background:currentColor;border-radius:40%/16%;
+  box-shadow:0 .5px 0 rgba(0,0,0,.2)}
+.bam:before{content:"";position:absolute;left:0;right:0;top:40%;height:20%;background:rgba(255,255,255,.72)}
+.bam:after{content:"";position:absolute;left:18%;right:18%;top:0;bottom:0;background:rgba(255,255,255,.28)}
+.gl{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;
+  font-weight:700;line-height:1}
+.num{top:-1%;height:50%;font-size:.62em;color:#17324f}
+.wan{top:44%;height:57%;font-size:.60em;color:#bf3226}
+.big{top:0;height:100%;font-size:.74em;color:#17324f}
+.big.red{color:#bf3226}
+.big.green{color:#12693c}
+.whitebox{position:absolute;inset:13% 15%;border:.12em solid #2a5fa0;border-radius:6%}
+.whitebox:after{content:"";position:absolute;inset:18%;border:.05em solid rgba(42,95,160,.35)}
+.fl-num{position:absolute;top:2%;left:8%;font-size:.23em;font-weight:700;z-index:3;line-height:1}
+.fl-name{position:absolute;top:2%;right:8%;font-size:.23em;font-weight:700;z-index:3;line-height:1}
+.fl-art{position:absolute;left:5%;top:16%;width:90%;height:81%;z-index:1}
+
+/* ---------- controls ---------- */
+.controls{position:sticky;top:0;z-index:50;margin:0 0 18px;
+  background:rgba(251,249,243,.94);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:10px;padding:8px 13px;
+  display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;
+  box-shadow:0 2px 9px rgba(0,0,0,.05)}
+.ctl{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted)}
+.ctl label{white-space:nowrap;font-weight:700}
+.ctl input[type=range]{width:92px;accent-color:#2f7d3a}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:7px;
+  padding:4px 10px;font-size:11.5px;font-weight:700;cursor:pointer}
+.btn:hover{background:#efebe0}
+.hint{font-size:11px;color:var(--muted);margin-left:auto;font-style:italic}
+
+/* ---------- reference ---------- */
+.refhead{margin:26px 0 10px;padding-top:14px;border-top:3px double #b5ad99;
+  font-size:19px;font-weight:800}
+.refgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:9px;padding:13px 15px}
+.card h3{margin:0 0 8px;font-size:14px;font-weight:800}
+.card p{font-size:11.4px;color:#4a443c;margin:0 0 6px}
+table.pay{border-collapse:collapse;width:100%;font-size:11.5px}
+table.pay th,table.pay td{border:1px solid var(--line);padding:3px 7px;text-align:center}
+table.pay th{background:#e7f0e6;font-weight:800}
+table.pay td.f{font-weight:800;color:#2f7d3a;background:#fafaf6}
+table.term{border-collapse:collapse;width:100%;font-size:11.5px}
+table.term td{border:1px solid var(--line);padding:3px 8px}
+table.term td:nth-child(2){font-family:"PingFang TC","Noto Serif CJK TC",serif;text-align:right}
+table.term tr:nth-child(odd) td{background:#fafaf6}
+.suitrow{display:grid;grid-template-columns:86px 1fr;align-items:center;gap:8px;margin-bottom:18px}
+.suitrow .lb{font-size:13px;font-weight:800;text-align:right;line-height:1.25}
+.suitrow .lb small{display:block;font-weight:600;color:var(--muted);font-size:11px;
+  font-family:"PingFang TC","Noto Serif CJK TC",serif}
+.suitrow .tiles{display:flex;gap:calc(var(--tw)*0.42) calc(var(--tw)*0.1);flex-wrap:wrap;align-items:flex-end}
+.suitgrid .suitrow .tiles{column-gap:calc(var(--tw)*0.30);flex-wrap:nowrap}
+.suitgrid{display:grid;grid-template-columns:auto auto;gap:6px 30px;align-items:start;justify-content:start}
+.suitnums{display:grid;grid-template-columns:86px 1fr;gap:8px;margin-bottom:-2px}
+.suitnums .nn{display:flex;column-gap:calc(var(--tw)*0.30)}
+.suitnums .nn span{width:var(--tw);text-align:center;font-size:14px;font-weight:800;color:var(--muted)}
+.namedrow{display:grid;grid-template-columns:86px 1fr;align-items:end;gap:8px;margin-bottom:5px}
+.namedrow .lb{font-size:13px;font-weight:800;text-align:right;line-height:1.25}
+.namedrow .lb small{display:block;font-weight:600;color:var(--muted);font-size:11px;
+  font-family:"PingFang TC","Noto Serif CJK TC",serif}
+.namedrow .cells{display:flex;gap:calc(var(--tw)*0.42) calc(var(--tw)*0.1)}
+.namedrow .cell{display:flex;flex-direction:column;align-items:center;gap:2px}
+.namedrow .cap{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+.seat{width:100%;max-width:300px;margin:0 auto;display:block}
+.wide2{grid-column:1/-1}
+
+@media print{
+  body{background:#fff}
+  .controls{display:none}
+  .wrap{max-width:none;padding:8px}
+  .cols{column-count:3}
+  @page{size:A3 landscape;margin:8mm}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="mast">
+  <div class="title">
+    <h1>Hong Kong Mahjong Scoring Sheet</h1>
+    <span class="dash">—</span>
+    <span class="zh">香港麻雀正統牌型</span>
+  </div>
+  <div class="howto">
+    <h4>How to Use</h4>
+    <ul>
+      <li>Your hand's Fan score is the <strong>sum</strong> of the Fan of all matching features.</li>
+      <li><em>Indented features replace the parent feature</em> — count the child only. Full Flush replaces Mixed Flush; Win by Kong Replacement replaces Self-Pick.</li>
+      <li>Unless stated otherwise, <em>triplets and quadruplets are interchangeable</em>.</li>
+      <li>Calculate your payout on the Payment Table below. A red <span style="color:#bf3226">▲</span> marks the winning tile.</li>
+      <li class="warn"><strong>†</strong> marks hands whose rules vary by table — MCR or Taiwanese imports. Agree them before the first deal.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="ctl"><label for="rx">Tilt</label><input id="rx" type="range" min="-45" max="35" value="-13"><span id="rxv">-13°</span></div>
+  <div class="ctl"><label for="ry">Turn</label><input id="ry" type="range" min="-50" max="50" value="18"><span id="ryv">18°</span></div>
+  <div class="ctl"><label for="sz">Size</label><input id="sz" type="range" min="20" max="52" value="26"><span id="szv">26</span></div>
+  <button class="btn" id="flat">Flat-on</button>
+  <button class="btn" id="spin">Spin all</button>
+  <button class="btn" id="reset">Reset</button>
+  <span class="hint">drag a tile to rotate it · double-click to release</span>
+</div>
+
+<div class="cols" id="cols"></div>
+
+<div class="refhead">Reference</div>
+<div class="refgrid" id="ref"></div>
+
+</div>
+
+<script>
+/* ==================== tile artwork ==================== */
+var NUMS = ["一","二","三","四","五","六","七","八","九"];
+
+var DOTPOS = {
+  1:[[50,50]], 2:[[50,28],[50,72]], 3:[[26,23],[50,50],[74,77]],
+  4:[[30,28],[70,28],[30,72],[70,72]],
+  5:[[28,26],[72,26],[50,50],[28,74],[72,74]],
+  6:[[30,22],[70,22],[30,50],[70,50],[30,78],[70,78]],
+  7:[[25,17],[50,29],[75,41],[30,63],[70,63],[30,86],[70,86]],
+  8:[[32,15],[68,15],[32,38],[68,38],[32,62],[68,62],[32,85],[68,85]],
+  9:[[25,22],[50,22],[75,22],[25,50],[50,50],[75,50],[25,78],[50,78],[75,78]]
+};
+var DOTSZ = {1:46,2:36,3:31,4:33,5:29,6:29,7:25,8:23,9:27};
+var DOTCOL = {
+  1:["b"], 2:["g","b"], 3:["b","g","r"], 4:["b","g","g","b"],
+  5:["b","g","r","g","b"], 6:["g","g","r","r","r","r"],
+  7:["g","g","g","r","r","r","r"], 8:["b","b","b","b","b","b","b","b"],
+  9:["r","r","r","g","g","g","b","b","b"]
+};
+var BAMPOS = {
+  2:[[50,27],[50,73]], 3:[[50,24],[32,73],[68,73]],
+  4:[[32,27],[68,27],[32,73],[68,73]],
+  5:[[29,25],[71,25],[50,50],[29,75],[71,75]],
+  6:[[28,25],[50,25],[72,25],[28,75],[50,75],[72,75]],
+  7:[[50,17],[28,52],[50,52],[72,52],[28,84],[50,84],[72,84]],
+  8:[[27,25],[42,25],[58,25],[73,25],[27,75],[42,75],[58,75],[73,75]],
+  9:[[26,21],[50,21],[74,21],[26,50],[50,50],[74,50],[26,79],[50,79],[74,79]]
+};
+var BAMSZ = {2:[14,30],3:[13,26],4:[13,26],5:[12,25],6:[11,25],7:[10,22],8:[9,25],9:[10,21]};
+var BAMCOL = {
+  2:["g","g"], 3:["g","g","g"], 4:["g","g","g","g"],
+  5:["g","g","r","g","g"], 6:["g","g","g","g","g","g"],
+  7:["r","g","g","g","g","g","g"], 8:["g","g","g","g","g","g","g","g"],
+  9:["g","g","g","r","r","r","g","g","g"]
+};
+var BIRD = '<svg viewBox="0 0 100 130" style="position:absolute;inset:8% 14%;width:72%;height:84%">'
+  + '<ellipse cx="52" cy="76" rx="27" ry="34" fill="#1a7a44"/>'
+  + '<ellipse cx="52" cy="76" rx="16" ry="24" fill="#2ea25e"/>'
+  + '<path d="M52 108 L34 128 L52 120 L70 128 Z" fill="#bf3226"/>'
+  + '<circle cx="48" cy="33" r="17" fill="#1a7a44"/>'
+  + '<circle cx="53" cy="30" r="4" fill="#fdfbf4"/>'
+  + '<path d="M31 33 L8 40 L31 44 Z" fill="#bf3226"/>'
+  + '<path d="M62 20 q14 -14 20 -2 q-9 -2 -16 8 Z" fill="#bf3226"/>'
+  + '<path d="M74 60 q16 12 10 30 q-8 -14 -18 -20 Z" fill="#2ea25e"/></svg>';
+
+function blossom(cx, cy, s, petal, core){
+  var out = "";
+  for(var i=0;i<5;i++){
+    var a = (i*72 - 90) * Math.PI/180;
+    out += '<circle cx="'+(cx + Math.cos(a)*s*0.95).toFixed(1)
+         + '" cy="'+(cy + Math.sin(a)*s*0.95).toFixed(1)
+         + '" r="'+(s*0.74).toFixed(1)+'" fill="'+petal+'"/>';
+  }
+  return out + '<circle cx="'+cx+'" cy="'+cy+'" r="'+(s*0.5).toFixed(1)+'" fill="'+core+'"/>';
+}
+function chrysanth(){
+  var out = "", i;
+  for(i=0;i<16;i++) out += '<ellipse cx="52" cy="26" rx="5.5" ry="18" fill="#d99a24" transform="rotate('+(i*22.5)+' 52 48)"/>';
+  for(i=0;i<12;i++) out += '<ellipse cx="52" cy="34" rx="4.6" ry="13" fill="#f0bb45" transform="rotate('+(i*30+15)+' 52 48)"/>';
+  return out + '<circle cx="52" cy="48" r="8" fill="#b9701a"/>';
+}
+var FIGURE = {
+  h1: '<path d="M4 110 q11 -6 22 0 t22 0 t22 0 t22 0" stroke="#3fa0cc" stroke-width="4" fill="none" stroke-linecap="round"/>'
+    + '<path d="M4 121 q11 -6 22 0 t22 0 t22 0 t22 0" stroke="#7fc8e4" stroke-width="3.5" fill="none" stroke-linecap="round"/>'
+    + '<line x1="30" y1="84" x2="93" y2="22" stroke="#8a5a2b" stroke-width="4.5" stroke-linecap="round"/>'
+    + '<line x1="93" y1="22" x2="90" y2="58" stroke="#6b6355" stroke-width="1.8"/>'
+    + '<path d="M90 58 l7 5 l-7 5 l-5 -5 z" fill="#bf3226"/>'
+    + '<path d="M33 60 q17 -7 32 0 l9 46 q-26 8 -50 0 z" fill="#2a5fa0"/>'
+    + '<circle cx="48" cy="48" r="13" fill="#f0d6b0"/>'
+    + '<path d="M21 44 q27 -30 54 0 z" fill="#d2a94e"/>'
+    + '<ellipse cx="48" cy="44" rx="28" ry="4" fill="#b08c38"/>',
+  h2: '<rect x="5" y="50" width="28" height="9" rx="4.5" fill="#8a5a2b"/>'
+    + '<rect x="5" y="62" width="28" height="9" rx="4.5" fill="#a87038"/>'
+    + '<rect x="5" y="74" width="28" height="9" rx="4.5" fill="#8a5a2b"/>'
+    + '<line x1="72" y1="106" x2="82" y2="32" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/>'
+    + '<path d="M82 30 q18 3 15 19 q-16 1 -20 -8 z" fill="#9aa0a4"/>'
+    + '<path d="M38 60 q17 -7 32 0 l8 46 q-25 8 -48 0 z" fill="#1a7a44"/>'
+    + '<circle cx="53" cy="48" r="13" fill="#f0d6b0"/>'
+    + '<path d="M39 40 q14 -14 28 0 q-14 6 -28 0 z" fill="#5a4632"/>'
+    + '<path d="M6 96 q10 -10 20 -4 q-9 10 -20 4z" fill="#2ea25e"/>',
+  h3: '<g stroke="#c9a24a" stroke-width="3.2" stroke-linecap="round" fill="none">'
+    + '<path d="M12 122 q3 -30 8 -48"/><path d="M26 124 q-1 -28 -3 -42"/></g>'
+    + '<ellipse cx="20" cy="62" rx="6" ry="12" fill="#dcb44e"/>'
+    + '<ellipse cx="25" cy="72" rx="5" ry="10" fill="#c99b36"/>'
+    + '<line x1="70" y1="108" x2="82" y2="34" stroke="#8a5a2b" stroke-width="4.5" stroke-linecap="round"/>'
+    + '<path d="M82 32 l17 7 l-5 13 l-15 -9 z" fill="#9aa0a4"/>'
+    + '<path d="M38 62 q17 -7 32 0 l8 45 q-25 8 -48 0 z" fill="#bf3226"/>'
+    + '<circle cx="53" cy="50" r="13" fill="#f0d6b0"/>'
+    + '<path d="M27 46 q26 -26 52 0 z" fill="#d2a94e"/>',
+  h4: '<g fill="#c4dcea"><circle cx="12" cy="20" r="4.2"/><circle cx="88" cy="30" r="3.6"/>'
+    + '<circle cx="20" cy="46" r="3"/><circle cx="86" cy="66" r="3.2"/><circle cx="9" cy="76" r="2.8"/></g>'
+    + '<path d="M31 62 q19 -7 36 0 l9 46 q-27 8 -54 0 z" fill="#22447a"/>'
+    + '<circle cx="49" cy="48" r="13" fill="#f0d6b0"/>'
+    + '<path d="M35 42 q14 -18 28 0 z" fill="#1b3050"/>'
+    + '<rect x="30" y="36" width="38" height="6" rx="3" fill="#1b3050"/>'
+    + '<path d="M26 90 l23 -7 l0 23 l-23 7 z" fill="#fdfbf4" stroke="#8a7c5c" stroke-width="1.6"/>'
+    + '<path d="M72 90 l-23 -7 l0 23 l23 7 z" fill="#efe8d6" stroke="#8a7c5c" stroke-width="1.6"/>',
+  h5: '<path d="M10 126 q18 -32 32 -52 q12 -18 26 -34" stroke="#6b4423" stroke-width="7.5" fill="none" stroke-linecap="round"/>'
+    + '<path d="M38 88 q18 -8 30 -24" stroke="#6b4423" stroke-width="5" fill="none" stroke-linecap="round"/>'
+    + '<path d="M50 64 q-16 -8 -30 -6" stroke="#6b4423" stroke-width="4.5" fill="none" stroke-linecap="round"/>'
+    + blossom(74,30,12,"#ea7d9b","#f5d24a") + blossom(70,62,10,"#e06a8c","#f5d24a")
+    + blossom(20,54,9.5,"#ea7d9b","#f5d24a") + blossom(42,100,9,"#e06a8c","#f5d24a"),
+  h6: '<g stroke="#1e7a45" fill="none" stroke-linecap="round">'
+    + '<path d="M44 126 q-32 -28 -38 -70" stroke-width="5"/>'
+    + '<path d="M47 126 q-13 -44 -3 -80" stroke-width="5"/>'
+    + '<path d="M50 126 q20 -38 44 -54" stroke-width="5"/>'
+    + '<path d="M50 126 q28 -20 46 -12" stroke-width="4"/></g>'
+    + '<g fill="#9b59b6"><ellipse cx="58" cy="54" rx="5" ry="13" transform="rotate(-32 58 54)"/>'
+    + '<ellipse cx="74" cy="58" rx="5" ry="13" transform="rotate(30 74 58)"/>'
+    + '<ellipse cx="66" cy="44" rx="4.6" ry="12"/></g>'
+    + '<circle cx="66" cy="58" r="5.5" fill="#f5d24a"/>',
+  h7: '<line x1="52" y1="80" x2="52" y2="128" stroke="#1e7a45" stroke-width="5" stroke-linecap="round"/>'
+    + '<path d="M52 104 q-22 -14 -34 -2 q16 14 34 2z" fill="#2ea25e"/>'
+    + '<path d="M52 114 q22 -12 32 2 q-18 12 -32 -2z" fill="#1e7a45"/>' + chrysanth(),
+  h8: '<rect x="31" y="4" width="17" height="124" rx="5" fill="#1e7a45"/>'
+    + '<rect x="57" y="32" width="13" height="96" rx="4" fill="#2ea25e"/>'
+    + '<g stroke="#0d5730" stroke-width="3">'
+    + '<line x1="31" y1="40" x2="48" y2="40"/><line x1="31" y1="78" x2="48" y2="78"/><line x1="31" y1="112" x2="48" y2="112"/>'
+    + '<line x1="57" y1="62" x2="70" y2="62"/><line x1="57" y1="98" x2="70" y2="98"/></g>'
+    + '<g fill="#3fbb72"><path d="M31 32 q-24 -14 -30 4 q22 12 30 -4z"/>'
+    + '<path d="M48 22 q22 -18 31 -3 q-20 14 -31 3z"/>'
+    + '<path d="M70 56 q22 -7 26 9 q-22 5 -26 -9z"/></g>'
+};
+var FLOWERS = {
+  h1:["1","春","#1f5fa8"], h2:["2","夏","#1f5fa8"], h3:["3","秋","#1f5fa8"], h4:["4","冬","#1f5fa8"],
+  h5:["1","梅","#1a7a44"], h6:["2","蘭","#1a7a44"], h7:["3","菊","#1a7a44"], h8:["4","竹","#1a7a44"]
+};
+var WINDS = {we:"東", ws:"南", ww:"西", wn:"北"};
+
+function panelHTML(code){
+  var m = /^([1-9])([psm])$/.exec(code);
+  if(m){
+    var n = +m[1], suit = m[2], out = "", i;
+    if(suit === "p"){
+      var pos = DOTPOS[n], sz = DOTSZ[n], col = DOTCOL[n];
+      for(i=0;i<pos.length;i++)
+        out += '<i class="dot c-'+col[i]+'" style="left:'+pos[i][0]+'%;top:'+pos[i][1]+'%;width:'+sz+'%;aspect-ratio:1"></i>';
+      return out;
+    }
+    if(suit === "s"){
+      if(n === 1) return BIRD;
+      var bp = BAMPOS[n], bs = BAMSZ[n], bc = BAMCOL[n];
+      for(i=0;i<bp.length;i++)
+        out += '<i class="bam c-'+bc[i]+'" style="left:'+bp[i][0]+'%;top:'+bp[i][1]+'%;width:'+bs[0]+'%;height:'+bs[1]+'%"></i>';
+      return out;
+    }
+    return '<span class="gl num">'+NUMS[n-1]+'</span><span class="gl wan">萬</span>';
+  }
+  if(WINDS[code]) return '<span class="gl big">'+WINDS[code]+'</span>';
+  if(code === "dr") return '<span class="gl big red">中</span>';
+  if(code === "dg") return '<span class="gl big green">發</span>';
+  if(code === "dw") return '<span class="whitebox"></span>';
+  if(FLOWERS[code]){
+    var f = FLOWERS[code];
+    return '<span class="fl-num" style="color:'+f[2]+'">'+f[0]+'</span>'
+      + '<span class="fl-name" style="color:'+f[2]+'">'+f[1]+'</span>'
+      + '<svg class="fl-art" viewBox="0 0 100 130" preserveAspectRatio="xMidYMax meet">'+FIGURE[code]+'</svg>';
+  }
+  return "";
+}
+function tileHTML(code){
+  var win = false, down = false;
+  if(code.slice(-1) === "*"){ win = true; code = code.slice(0,-1); }
+  if(code === "xx"){ down = true; }
+  return '<div class="tile'+(win?" win":"")+'" data-t="'+code+'">'
+    + '<div class="cube">'
+    + '<div class="f front'+(down?" jade":"")+'">'+(down?"":'<div class="panel">'+panelHTML(code)+'</div>')+'</div>'
+    + '<div class="f back"></div><div class="f left"></div><div class="f right"></div>'
+    + '<div class="f top"></div><div class="f bottom"></div></div></div>';
+}
+function optsHTML(opts){
+  return '<div class="opts">' + opts.map(function(o){
+    return '<div class="opt"><div class="optcap">' + o[1] + '</div>'
+         + '<div class="hand">' + handHTML(o[0]) + '</div></div>';
+  }).join("") + '</div>';
+}
+function handHTML(str){
+  if(!str) return "";
+  return str.split(/\s+/).map(function(t){
+    return t === "|" ? '<span class="gap"></span>' : tileHTML(t);
+  }).join("");
+}
+
+/* ==================== scoring data (danma v1.0 fan values) ==================== */
+var SECTIONS = [
+{ cls:"g-win", title:"Win Actions", entries:[
+  {f:"1", en:"Self-Pick", cn:"自摸", ds:"You select your winning tile from the wall."},
+  {f:"2", kid:true, en:"Win by Kong Replacement", cn:"槓上開花",
+   ds:"The winning tile is a replacement tile drawn after declaring a Kong (four of a kind).",
+   rep:"Replaces Self-Pick — score 2, not 2 + 1.",
+   ex:"Mixed Flush 3 + Dragon 1 + Kong Replacement 2 = 6 Fan",
+   h:"5s 5s 5s 5s | 2s 3s 4s | 6s 7s 8s | dg dg dg | 9s 9s*"},
+  {f:"9", kid:true, en:"Double Kong Replacement", cn:"槓上槓",
+   ds:"Call a Kong, call a second Kong using the replacement tile, then win on the second replacement.",
+   rep:"Replaces Self-Pick and Win by Kong Replacement — score 9 only.",
+   ex:"Mixed Flush 3 + Dragon 1 + Double Kong 9 = 13 Fan (limit)",
+   h:"2p 2p 2p 2p | 7p 7p 7p 7p | 4p 5p 6p | dr dr dr | 9p 9p*"},
+  {f:"1", en:"Concealed Hand", cn:"門前清",
+   ds:"You did not take any tiles from other players in order to win.",
+   h:"xx xx xx xx xx xx xx xx xx xx xx xx xx | 4s*"},
+  {f:"1", en:"Robbing the Kong", cn:"搶槓",
+   ds:"You win by interrupting another player upgrading a Pong (a triplet) to a Kong using your winning tile.",
+   ex:"Mixed Flush 3 + Dragon 2 + Robbing the Kong 1 = 6 Fan — all four copies are in their Kong, so the robbed tile must complete a sequence",
+   h:"dg dg dg | dr dr dr | 2m 3m 4m | 6m 7m 8m* | 5m 5m"},
+  {f:"1", en:"Moon Under The Sea", cn:"海底撈月",
+   ds:"Your winning tile was the last tile in the wall or the last discard."}
+]},
+{ cls:"g-set", title:"Hands by Set Type", entries:[
+  {f:"1", en:"All Sequences", cn:"平糊", ds:"All four sets are sequences, plus a pair, which may be honours.",
+   ex:"All Sequences 1 = 1 Fan — on its own this sits below a 3 Fan table minimum",
+   h:"2m 3m 4m | 5m 6m 7m | 3p 4p 5p | 6p 7p 8p | we we"},
+  {f:"3", en:"All Triplets", cn:"對對糊", ds:"All four sets are three of a kind, plus a pair.",
+   ex:"All Triplets 3 = 3 Fan, or 4 Fan if 東 is your seat or the round wind",
+   h:"1m 1m 1m | 5p 5p 5p | 8s 8s 8s | we we we | 3m 3m"},
+  {f:"8", kid:true, en:"All Concealed Triplets", cn:"四暗刻",
+   ds:"All sets are triplets and no tiles taken from other players. Win by self-pick, or by taking a discard that completes the pair. Claiming a discard to finish a triplet would expose that set — you still win, but with only three concealed triplets the hand downgrades to All Triplets 3.",
+   rep:"Replaces All Triplets — score 8, not 8 + 3.",
+   ex:"All Concealed Triplets 8 = 8 Fan, or 9 if 北 is your seat or the round wind — All Triplets 3 is replaced, and concealment is required, so Concealed Hand is built in",
+   h:"2p 2p 2p | 6p 6p 6p | 4s 4s 4s | wn wn wn | 9m 9m*"},
+  {f:"13", kid:true, en:"All Quadruplets", cn:"四槓子", ds:"All four sets are quadruplets, plus a pair. Kongs may be claimed from discards. A discard that completes your fourth Kong is not a win — declare the Kong, draw a Replacement Tile, and win on that, or on a later discard once all four Kongs are down and only the pair is open.",
+   rep:"Replaces All Triplets.",
+   ex:"All Quadruplets 13 = 13 Fan — the limit; the 中 Kong and All Triplets are not added",
+   h:"2m 2m 2m 2m | 5p 5p 5p 5p | 9s 9s 9s 9s | dr dr dr dr | 7m 7m"}
+]},
+{ cls:"g-flw", title:"Bonus Tiles (Flowers & Seasons)", entries:[
+  {f:"1", en:"No Flowers or Seasons", cn:"無花",
+   ds:"You drew none of the eight bonus tiles all hand. Nothing to show \u2014 the Fan is for their absence.",
+   h:""},
+  {f:"1x", wide:true, en:"Seat Flower or Season", cn:"正花",
+   ds:"1 Fan for each flower or season matching your seat number. East is 1, South 2, West 3, North 4.",
+   h:""},
+  {f:"2", en:"All Flowers or All Seasons", cn:"一檯花",
+   ds:"You have all four flowers, <b>or</b> all four seasons. A mix of four bonus tiles taken from both groups does not count.",
+   h:""},
+  {f:"3", en:"Seven Flowers", cn:"花糊",
+   ds:"Collect seven of the eight bonus tiles (flowers and seasons) and you may win at once, no matter what your hand holds.",
+   h:""},
+  {f:"8", en:"Eight Flowers", cn:"大花糊",
+   ds:"Collect all eight bonus tiles and you may win at once, no matter what your hand holds.",
+   h:""}
+]},
+{ cls:"g-tile", title:"Hands by Tile Type", entries:[
+  {f:"1x", wide:true, en:"Dragon", cn:"三元牌",
+   ds:"A triplet of dragon tiles. Any one of the three below scores on its own, and each one you hold scores again.",
+   opts:[["dr dr dr","Red 1 Fan"],["dg dg dg","Green 1 Fan"],["dw dw dw","White 1 Fan"]],
+   ex:"One triplet = 1 Fan. Two = 2 Fan. All three is Big Three Dragons 8, which replaces this.",
+   h:"dr dr dr | dg dg dg | dw dw dw"},
+  {f:"5", kid:true, en:"Small Three Dragons", cn:"小三元",
+   ds:"Two dragon triplets and a pair of the third dragon.",
+   rep:"Replaces the per-triplet Dragon score — score 5 flat.",
+   ex:"Small Three Dragons 5 + Mixed Flush 3 = 8 Fan — the per-triplet Dragon score is replaced, not added",
+   h:"dr dr dr | dg dg dg | dw dw | 2p 3p 4p | 6p 7p 8p"},
+  {f:"8", kid:true, en:"Big Three Dragons", cn:"大三元", ds:"Three dragon triplets.",
+   rep:"Replaces Dragon and Small Three Dragons — score 8 flat.",
+   ex:"Big Three Dragons 8 = 8 Fan — Dragon and Small Three Dragons are replaced; two suits here, so no Mixed Flush",
+   h:"dr dr dr | dg dg dg | dw dw dw | 3p 4p 5p | 6m 6m"},
+  {f:"1x", wide:true, en:"Round Wind / Seat Wind", cn:"圈風 / 門風",
+   ds:"A game runs four rounds — East, South, West, North. A triplet of the current round's wind, or of your own seat wind, scores. Each of the four below counts <strong>only</strong> if it is one of those two for you.",
+   opts:[["we we we","East 1 Fan"],["ws ws ws","South 1 Fan"],["ww ww ww","West 1 Fan"],["wn wn wn","North 1 Fan"]],
+   ex:"A triplet of the other two winds scores nothing. One triplet that is both the round wind and your seat wind = 2 Fan.",
+   h:"we we we | ws ws ws | ww ww ww | wn wn wn"},
+  {f:"6", kid:true, en:"Small Four Winds", cn:"小四喜",
+   ds:"Three wind triplets and a pair of the fourth wind.",
+   rep:"Replaces Round / Seat Wind — score 6 flat.",
+   ex:"Small Four Winds 6 + Mixed Flush 3 = 9 Fan — the Round / Seat Wind score is replaced, not added",
+   h:"we we we | ws ws ws | ww ww ww | wn wn | 4s 5s 6s"},
+  {f:"13", kid:true, en:"Big Four Winds", cn:"大四喜", ds:"Four wind triplets.",
+   rep:"Replaces Round / Seat Wind and Small Four Winds.",
+   ex:"Big Four Winds 13 = 13 Fan — the limit; All Triplets 3 and Mixed Flush 3 are not counted on top",
+   h:"we we we | ws ws ws | ww ww ww | wn wn wn | 5p 5p"},
+  {f:"3", en:"Mixed Flush", cn:"混一色", ds:"Your hand contains only one suit plus honours (winds & dragons). Can have both pongs and chows (sequences).",
+   ex:"Mixed Flush 3 + Dragon 1 = 4 Fan — the 東 pair scores nothing, only a triplet would",
+   h:"1m 2m 3m | 4m 5m 6m | 7m 8m 9m | dr dr dr | we we"},
+  {f:"7", kid:true, en:"Full Flush", cn:"清一色", ds:"Your hand contains only one suit. Can have both pongs and chows (sequences).",
+   rep:"Replaces Mixed Flush — score 7, not 7 + 3.",
+   ex:"Full Flush 7 = 7 Fan — Mixed Flush 3 is replaced, not added",
+   h:"1s 1s 1s | 2s 3s 4s | 4s 5s 6s | 7s 8s 9s | 9s 9s"},
+  {f:"4", en:"Mixed Terminals", cn:"混么九",
+   ds:"Your hand contains only ones, nines and honours (winds & dragons). 3 Fan from All Triplets is included.",
+   ex:"Mixed Terminals 4 + Dragon 1 = 5 Fan — the All Triplets 3 is already inside the 4",
+   h:"1m 1m 1m | 9p 9p 9p | 1s 1s 1s | dr dr dr | we we"},
+  {f:"13", kid:true, en:"All Terminals", cn:"清么九",
+   ds:"Your hand contains only ones and nines. 3 Fan from All Triplets is included.",
+   rep:"Replaces Mixed Terminals and All Triplets.",
+   ex:"All Terminals 13 = 13 Fan — the limit; Mixed Terminals 4 and All Triplets 3 are replaced, not added",
+   h:"1m 1m 1m | 9m 9m 9m | 1p 1p 1p | 9s 9s 9s | 1s 1s"},
+  {f:"10", kid:true, en:"All Honours", cn:"字一色",
+   ds:"Your hand contains only honour tiles (winds & dragons). 3 Fan from All Triplets is already included.",
+   rep:"Replaces Mixed Terminals and All Triplets. No suit tiles, so Mixed Flush does not apply.",
+   ex:"All Honours 10 + Small Three Dragons 5 = 15, capped at the 13 Fan limit — 中中中 發發發 白白 is Small Three Dragons",
+   h:"we we we | ws ws ws | dr dr dr | dg dg dg | dw dw"},
+  {f:"1x", en:"Kong", cn:"槓",
+   ds:"Each quadruplet scores. A concealed Kong is worth more, since no one helped you build it.",
+   var:true,
+   opts:[["5s 5s 5s 5s","open — 1 Fan each"],
+         ["xx 5s 5s xx","concealed — 2 Fan each"]],
+   ex:"A concealed Kong shows its outer tiles face down. Four Kongs is All Quadruplets 13, which replaces this",
+   h:"5s 5s 5s 5s"}
+]},
+{ cls:"g-spec", title:"Special Hands", entries:[
+  {f:"4", en:"Seven Pairs", cn:"七對子",
+   ds:"Seven different pairs. Can stack with Mixed Flush, Full Flush and All Honours.",
+   var:true,
+   ex:"* Seven Pairs 4 = 4 Fan alone.  ** + Mixed Flush 3 = 7 Fan, or + Full Flush 7 = 11.  *** + All Honours 10 = 14, capped at the 13 Fan limit. You can never Pong or Chow here, so Concealed Hand is built in",
+   opts:[["2m 2m | 5m 5m | 8m 8m | 3p 3p | 7p 7p | 4s 4s | dr dr","three suits — 4 Fan  *"],
+         ["2m 2m | 5m 5m | 7m 7m | 9m 9m | we we | ws ws | dr dr","with Mixed Flush — 7 Fan  **"],
+         ["we we | ws ws | ww ww | wn wn | dr dr | dg dg | dw dw","with All Honours — 13 limit  ***"]],
+   h:"2m 2m | 5m 5m | 8m 8m | 3p 3p | 7p 7p | 4s 4s | dr dr"},
+  {f:"2x", en:"Luxury Seven Pairs", cn:"豪華七對",
+   ds:"A Seven Pairs hand in which four identical tiles stand as two of the seven pairs. Scores for each such set.",
+   var:true,
+   ex:"Seven Pairs 4 + Luxury 2 = 6 Fan. A Kong breaks it. Dragon Fan needs a triplet, so an honour quad adds nothing; Concealed Hand is built in",
+   h:"dr dr dr dr | 5m 5m | 8m 8m | 3p 3p | 7p 7p | 4s 4s*"},
+  {f:"5", en:"Knitted Tiles", cn:"組合龍",
+   ds:"Special run made in this sequence: 1-4-7 in one suit, 2-5-8 in the second, 3-6-9 in the third — nine tiles \"knitted\" across the suits. Plus one ordinary set and a pair.",
+   var:true,
+   ex:"Knitted Tiles 5 = 5 Fan — three suits, so no flush, and 中中 scores nothing. The non-knitted set may be Ponged or Chowed; Concealed adds 1",
+   h:"1m 4m 7m | 2p 5p 8p | 3s 6s 9s | | | 4s 5s 6s | dr dr*"},
+  {f:"8", en:"Lesser Honours", cn:"全不靠",
+   ds:"Fourteen single tiles, no set and no pair. A mix of honour tiles (winds & dragons) and knitted runs (1-4-7, 2-5-8, 3-6-9), one to each suit. There are only two shapes: 9 knitted + 5 honours, or 8 knitted + 6 honours.",
+   var:true,
+   ex:"Lesser Honours 8 = 8 Fan. With no sets there is nothing to claim, so Concealed Hand is built in. Self-Pick and flowers still do.",
+   opts:[["1m 4m 7m | 2p 5p 8p | 3s 6s 9s | | | we ws ww wn dw*","all 9 knitted + any 5 honours"],
+         ["1s 4s 7s | 2m 5m 8m | 6p 9p | | | we ws ww wn dr dg*","any 8 knitted + any 6 honours"]],
+   h:"1m 4m 7m | 2p 5p 8p | 3s 6s 9s | | | we ws ww wn dw*"},
+  {f:"10", en:"Greater Honours", cn:"七星不靠",
+   ds:"Must have all seven honours (winds & dragons) as singles plus <b>any</b> seven knitted tiles — fourteen singles, no set and no pair.",
+   var:true,
+   ex:"Greater Honours 10 = 10 Fan. Concealed by definition, so Concealed Hand is built in. Self-Pick and flowers still do.",
+   h:"1m 4m 7m | 2p 5p 8p | 3s | | | we ws ww wn dr dg dw*"},
+  {f:"13", en:"Thirteen Orphans", cn:"十三么",
+   ds:"One of each 1 and 9 from all three suits, and one of each of the seven honours (winds & dragons), plus one extra duplicate of any tile in the hand. Concealed by definition.",
+   ex:"Thirteen Orphans 13 = 13 Fan — the limit, so nothing adds on top",
+   h:"1m 9m | 1p 9p | 1s 9s | we ws ww wn | dr dg dw | 1m*"},
+  {f:"13", en:"Nine Gates", cn:"九蓮寶燈",
+   ds:"111 2345678 999 of a single suit. The winning tile can be any 1 to 9 of that suit — nine ways to win, hence the name. Must be fully concealed.",
+   ex:"Nine Gates 13 = 13 Fan — the limit; the Full Flush 7 inside it is not added",
+   h:"1s 1s 1s | 2s 3s 4s 5s 6s 7s 8s | 9s 9s 9s | 5s*"},
+  {f:"13", en:"Blessing of Heaven", cn:"天糊", ds:"As dealer, your beginning hand wins.",
+   ex:"Blessing of Heaven 13 = 13 Fan — the pattern needs no Fan of its own, so even a chicken hand wins",
+   h:"1p 2p 3p | 4p 5p 6p | 7p 8p 9p | dg dg dg | we we*"},
+  {f:"13", en:"Blessing of Earth", cn:"地糊", ds:"As non-dealer, you win using the dealer's first discard.",
+   ex:"Blessing of Earth 13 = 13 Fan — the pattern needs no Fan of its own, so even a chicken hand wins",
+   h:"2s 3s 4s | 5s 6s 7s | 3m 4m 5m | 6m 7m 8m | dw dw*"},
+  {f:"13", en:"Blessing of Man", cn:"人糊", ds:"As non-dealer, you win on your first turn with a self-pick.",
+   ex:"Blessing of Man 13 = 13 Fan — the pattern needs no Fan of its own, so even a chicken hand wins",
+   h:"1m 2m 3m | 4p 5p 6p | 7s 8s 9s | 2p 3p 4p | 8m 8m*"}
+]}
+];
+
+/* ==================== render entries ==================== */
+var out = "";
+SECTIONS.forEach(function(sec){
+  out += '<div class="grp '+sec.cls+'"><h2>'+sec.title+'</h2>';
+  sec.entries.forEach(function(e){
+    out += '<div class="ent'+(e.kid?" kid":"")+'">'
+      + '<span class="bdg'+(e.wide?" wide":"")+'">'+e.f+'</span>'
+      + '<h3>'+e.en+(e.var?'<span class="vmark" title="rules vary by table"> †</span>':'')+' <span class="cn">'+e.cn+'</span></h3>'
+      + '<p>'+e.ds+'</p>'
+      + (e.rep ? '<div class="rep">'+e.rep+'</div>' : '')
+      + (e.opts ? optsHTML(e.opts) : '<div class="hand">'+handHTML(e.h)+'</div>')
+      + (e.ex ? '<div class="ex">'+e.ex+'</div>' : '')
+      + '</div>';
+  });
+  out += '</div>';
+});
+document.getElementById("cols").innerHTML = out;
+
+/* ==================== reference panels ==================== */
+function suitRow(label, zh, codes){
+  return '<div class="suitrow"><div class="lb">'+label+(zh?'<small>'+zh+'</small>':'')+'</div>'
+    + '<div class="tiles">'+handHTML(codes)+'</div></div>';
+}
+/* header row of numbers 1-9 sitting above the three numbered suits */
+function numHeader(){
+  var n = '';
+  for(var i=1;i<=9;i++) n += '<span>'+i+'</span>';
+  return '<div class="suitnums"><div></div><div class="nn">'+n+'</div></div>';
+}
+/* a row whose tiles each carry their own name above them */
+function namedRow(label, zh, items){
+  var cells = items.map(function(it){
+    return '<div class="cell"><div class="cap">'+it[1]+'</div>'+tileHTML(it[0])+'</div>';
+  }).join('');
+  return '<div class="namedrow"><div class="lb">'+label+(zh?'<small>'+zh+'</small>':'')+'</div>'
+    + '<div class="cells">'+cells+'</div></div>';
+}
+var payRows = [[0,1,7,48],[1,2,8,64],[2,4,9,96],[3,8,10,128],[4,16,11,192],[5,24,12,256],[6,32,"13+",384]];
+var payHTML = '<table class="pay"><tr><th>Fan</th><th>Points</th><th>Fan</th><th>Points</th></tr>';
+payRows.forEach(function(r){
+  payHTML += '<tr><td class="f">'+r[0]+'</td><td>'+r[1]+'</td><td class="f">'+r[2]+'</td><td>'+r[3]+'</td></tr>';
+});
+payHTML += '</table>';
+
+var terms = [["Mahjong","麻雀 ma zoek"],["Chow","上 soeng"],["Pong","碰 pung"],["Kong","槓 gong"],
+  ["Win from Self Pick","自摸 zi mo"],["Win from Discard","食糊 sik wu"],["Chicken (0 Fan) Hand","雞和 gaai wu"]];
+var termHTML = '<table class="term">';
+terms.forEach(function(t){ termHTML += '<tr><td>'+t[0]+'</td><td>'+t[1]+'</td></tr>'; });
+termHTML += '</table>';
+
+var seatSVG = '<svg class="seat" viewBox="0 0 300 300">'
+  + '<rect x="4" y="4" width="292" height="292" rx="8" fill="#f6efdc" stroke="#c9a24a" stroke-width="3"/>'
+  + '<g stroke="#b7ae95" stroke-width="1.5">'
+  + '<line x1="6" y1="6" x2="110" y2="110"/><line x1="294" y1="6" x2="190" y2="110"/>'
+  + '<line x1="6" y1="294" x2="110" y2="190"/><line x1="294" y1="294" x2="190" y2="190"/></g>'
+  + '<rect x="110" y="110" width="80" height="80" fill="#efe6cb" stroke="#b7ae95" stroke-width="1.5"/>'
+  + '<path d="M150 128 a22 22 0 1 1 -15 6" fill="none" stroke="#2b2a26" stroke-width="4"/>'
+  + '<path d="M133 128 l6 12 l-13 1 z" fill="#2b2a26"/>'
+  + '<text x="150" y="182" text-anchor="middle" font-size="13" font-weight="800" fill="#2b2a26" font-family="sans-serif">DEALER</text>'
+  + '<g text-anchor="middle" font-family="sans-serif">'
+  + '<text x="150" y="228" font-size="25" font-weight="800" fill="#1b1a17">東 East</text>'
+  + '<text x="150" y="250" font-size="17" font-weight="700" fill="#4a443c">5·9·13·17</text>'
+  + '<text x="150" y="270" font-size="16" font-weight="700" fill="#a3306d">❀ 1</text>'
+  + '<text x="150" y="56" font-size="25" font-weight="800" fill="#1b1a17">西 West</text>'
+  + '<text x="150" y="78" font-size="17" font-weight="700" fill="#4a443c">3·7·11·15</text>'
+  + '<text x="150" y="98" font-size="16" font-weight="700" fill="#a3306d">❀ 3</text>'
+  + '<text x="56" y="132" font-size="25" font-weight="800" fill="#1b1a17">北</text>'
+  + '<text x="56" y="158" font-size="25" font-weight="800" fill="#1b1a17">North</text>'
+  + '<text x="56" y="180" font-size="16" font-weight="700" fill="#4a443c">4·8·12·16</text>'
+  + '<text x="56" y="201" font-size="15" font-weight="700" fill="#a3306d">❀ 4</text>'
+  + '<text x="244" y="132" font-size="25" font-weight="800" fill="#1b1a17">南</text>'
+  + '<text x="244" y="158" font-size="25" font-weight="800" fill="#1b1a17">South</text>'
+  + '<text x="244" y="180" font-size="16" font-weight="700" fill="#4a443c">6·10·14·18</text>'
+  + '<text x="244" y="201" font-size="15" font-weight="700" fill="#a3306d">❀ 2</text>'
+  + '</g></svg>';
+
+document.getElementById("ref").innerHTML =
+    '<div class="card wide2"><h3>Suits, Honours and Bonus Tiles</h3>'
+  + '<div class="suitgrid"><div>'
+  +   numHeader()
+  +   suitRow("Dots","筒子 tung zi","1p 2p 3p 4p 5p 6p 7p 8p 9p")
+  +   suitRow("Sticks","索子 sok zi","1s 2s 3s 4s 5s 6s 7s 8s 9s")
+  +   suitRow("Man","萬子 maan zi","1m 2m 3m 4m 5m 6m 7m 8m 9m")
+  + '</div><div>'
+  +   namedRow("Winds","風 fung",[["we","East"],["ws","South"],["ww","West"],["wn","North"]])
+  +   namedRow("Dragons","三元 saam jyun",[["dr","Hung Zung"],["dg","Faat Coi"],["dw","Baak Baan"]])
+  +   namedRow("Flowers","花 faa",[["h5","Plum"],["h6","Orchid"],["h7","Mum"],["h8","Bamboo"]])
+  +   namedRow("Seasons","季 gwai",[["h1","Spring"],["h2","Summer"],["h3","Autumn"],["h4","Winter"]])
+  + '</div></div></div>'
+
+  + '<div class="card"><h3>Payment Table (New Style)</h3>' + payHTML
+  + '<p style="margin-top:9px">This table uses <strong>"discarder pays all"</strong> (全銃制), which increases the penalty for discarding another player\'s winning tile.</p>'
+  + '<p><strong>Self pick:</strong> all three players pay the points for your Fan total.</p>'
+  + '<p><strong>Discard:</strong> only the discarder pays, at <strong>2&times;</strong> the points.</p>'
+  + '<p>Older tables share that cost instead — the discarder pays double and the other two pay single each, for the same total.</p>'
+  + '<p>With chips, paying the Fan count (5 Fan = 5 chips) is quicker but flattens rewards: a limit hand pays 13, not 384.</p></div>'
+
+  + '<div class="card"><h3 class="ctr">Seating and Flower Numbers</h3>' + seatSVG
+  + '<p style="margin-top:8px">Play passes counter-clockwise. Your seat number tells you which flower and season are <em>yours</em> for 正花.</p></div>'
+
+  + '<div class="card"><h3>Terminology</h3>'
+  + '<p>A winning hand is four <em>sets</em> (melds) and a <em>pair</em>. Sets are a <em>sequence</em>, a <em>triplet</em>, or a <em>quadruplet</em>.</p>'
+  + '<p><strong>Sequences</strong> are three tiles of one suit in order (1-2-3 up to 7-8-9). Complete one from the player on your left by calling <em>Chow</em>.</p>'
+  + '<p><strong>Triplets</strong> are three identical tiles, completed from any player\'s discard as a <em>Pong</em>.</p>'
+  + '<p><strong>Quadruplets</strong> are four identical tiles, completed as a <em>Kong</em>. A self-formed quadruplet is a <em>Concealed Kong</em>. When declaring any Kong, draw a Replacement Tile from the dead end of the wall.</p>'
+  + '<p>Hong Kong style usually plays with a <strong>Minimum Fan</strong> — commonly 3. Below it you cannot declare a win.</p>'
+  + '<p>Scoring is also capped at a <strong>Limit</strong>, commonly 13 Fan. A hand worth more than the Limit simply pays the Limit.</p></div>'
+
+  + '<div class="card"><h3>Cantonese Terms</h3>' + termHTML
+  + '<p style="margin-top:9px">Fan values and structure follow the HKMJ Cheat Sheet v1.0 (3 April 2025) by /u/danma. Kong, Knitted Tiles, Lesser and Greater Honours and Luxury Seven Pairs are added here, with values from MCR or house choice. Tile examples, Fan breakdowns and notes by J. Lee.</p></div>';
+
+/* ==================== controls ==================== */
+var root = document.documentElement;
+var rx = document.getElementById("rx"), ry = document.getElementById("ry"), sz = document.getElementById("sz");
+function apply(){
+  root.style.setProperty("--grx", rx.value+"deg");
+  root.style.setProperty("--gry", ry.value+"deg");
+  root.style.setProperty("--tw", sz.value+"px");
+  document.getElementById("rxv").textContent = rx.value+"°";
+  document.getElementById("ryv").textContent = ry.value+"°";
+  document.getElementById("szv").textContent = sz.value;
+}
+[rx,ry,sz].forEach(function(el){ el.addEventListener("input", apply); });
+apply();
+function clearLocal(){
+  document.querySelectorAll(".tile").forEach(function(t){
+    t.style.removeProperty("--rx"); t.style.removeProperty("--ry");
+  });
+}
+document.getElementById("flat").onclick = function(){ rx.value=0; ry.value=0; apply(); clearLocal(); };
+document.getElementById("reset").onclick = function(){ rx.value=-13; ry.value=18; sz.value=26; apply(); clearLocal(); };
+document.getElementById("spin").onclick = function(){
+  clearLocal();
+  document.querySelectorAll(".tile").forEach(function(t,i){
+    setTimeout(function(){
+      t.style.setProperty("--ry", (parseFloat(ry.value)+360)+"deg");
+      setTimeout(function(){ t.style.removeProperty("--ry"); }, 520);
+    }, i*6);
+  });
+};
+var drag = null;
+document.addEventListener("pointerdown", function(e){
+  var t = e.target.closest(".tile");
+  if(!t) return;
+  var cs = getComputedStyle(t);
+  drag = { el:t, x:e.clientX, y:e.clientY,
+    ry: parseFloat(cs.getPropertyValue("--ry")) || parseFloat(ry.value),
+    rx: parseFloat(cs.getPropertyValue("--rx")) || parseFloat(rx.value) };
+  t.classList.add("dragging");
+  t.setPointerCapture(e.pointerId);
+});
+document.addEventListener("pointermove", function(e){
+  if(!drag) return;
+  var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  drag.el.style.setProperty("--ry", (drag.ry + dx*0.9)+"deg");
+  drag.el.style.setProperty("--rx", Math.max(-89, Math.min(89, drag.rx - dy*0.9))+"deg");
+});
+document.addEventListener("pointerup", function(){
+  if(!drag) return;
+  drag.el.classList.remove("dragging"); drag = null;
+});
+document.addEventListener("dblclick", function(e){
+  var t = e.target.closest(".tile");
+  if(!t) return;
+  t.style.removeProperty("--rx"); t.style.removeProperty("--ry");
+});
+
+/* ==================== self-check ==================== */
+(function(){
+  var tiles = document.querySelectorAll(".tile");
+  var bad = [];
+  tiles.forEach(function(t){
+    if(t.querySelector(".f.front.jade")) return;
+    var p = t.querySelector(".panel");
+    if(!p || !p.innerHTML.trim()) bad.push(t.getAttribute("data-t"));
+  });
+  var kids = document.querySelectorAll(".ent.kid").length;
+  var reps = document.querySelectorAll(".ent .rep").length;
+  console.log("SELFCHECK tiles=" + tiles.length
+    + " entries=" + document.querySelectorAll(".ent").length
+    + " indented=" + kids + " replaceNotes=" + reps
+    + " winMarkers=" + document.querySelectorAll(".tile.win").length
+    + " faceDown=" + document.querySelectorAll(".f.front.jade").length
+    + " emptyFaces=" + (bad.length ? bad.join(",") : "none")
+    + " overflowX=" + (document.documentElement.scrollWidth > document.documentElement.clientWidth));
+  var _nums = document.querySelectorAll(".suitnums .nn span").length;
+  var _caps = document.querySelectorAll(".namedrow .cap");
+  var _capTxt = Array.prototype.map.call(_caps, function(e){return e.textContent;}).join(",");
+  var _sg = document.querySelector(".suitgrid");
+  console.log("REFCHECK numbers=" + _nums + " captions=" + _caps.length
+    + " cols=" + (_sg ? getComputedStyle(_sg).gridTemplateColumns : "none")
+    + " overflow=" + (_sg ? (_sg.scrollWidth > _sg.clientWidth + 1) : "n/a")
+    + " | " + _capTxt);
+})();
+</script>
+</body>
+</html>
